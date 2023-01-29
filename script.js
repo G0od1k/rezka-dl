@@ -1,3 +1,5 @@
+const nameNode = document.querySelector(`#name`)
+
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, "req-rdl")
 })
@@ -5,7 +7,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
 chrome.runtime.onMessage.addListener((message) => {
     let json = JSON.parse(message)
 
-    document.querySelector(`input#name`).placeholder = json.name
+    nameNode.placeholder = json.name
 
     let seasons = getSeasons(json).reverse()
 
@@ -18,8 +20,8 @@ chrome.runtime.onMessage.addListener((message) => {
         epList.className = `ep_list`
         epList.id = `ep_l${x}s`
 
-        document.querySelector(`#name`).after(epList)
-        document.querySelector(`#name`).after(h)
+        nameNode.after(epList)
+        nameNode.after(h)
     })
 
     Object.keys(json)
