@@ -47,17 +47,17 @@ chrome.runtime.onMessage.addListener((message) => {
         })
 
     document.querySelector(`#download`).onclick = function () {
+        let name = nameNode.value || nameNode.placeholder
+
         if (isFilm(json)) {
-            download(json["0s0e"].url, json.name + ".mp4")
-            vttQ("0s0e")
-                ? download(json["0s0e"].vtt, json.name + ".vtt")
-                : false
+            download(json["0s0e"].url, name + ".mp4")
+            vttQ("0s0e") ? download(json["0s0e"].vtt, name + ".vtt") : false
             return
         }
         getSortedEpisodes(json).forEach((x) => {
             if (epQ(x)) {
-                download(json[x].url, `${json.name}_${x}.mp4`)
-                vttQ(x) ? download(json[x].vtt, `${json.name}_${x}.vtt`) : false
+                download(json[x].url, `${name}_${x}.mp4`)
+                vttQ(x) ? download(json[x].vtt, `${name}_${x}.vtt`) : false
             }
         })
     }
