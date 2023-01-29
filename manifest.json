@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "rezka-dl",
+    "description": "Браузерне розширення для завантаження фільмів та серіалів з rezka",
+    "version": "1.0.0",
+    "content_scripts": [
+        {
+            "matches": ["https://rezka.ag/*"],
+            "js": ["injected.js"],
+            "run_at": "document_start"
+        }
+    ],
+    "action": {
+        "default_title": "Показати спливаюче вікно",
+        "default_popup": "./popup.html"
+    },
+    "permissions": ["downloads"],
+    "author": "g0cd1k@gmail.com",
+    "homepage_url": "https://github.com/g0od1k/rezka-dl"
+}

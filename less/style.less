@@ -1,0 +1,78 @@
+body {
+    background-color: #121212;
+}
+
+#name {
+    background-color: #0000;
+    color: white;
+
+    font: 1.5rem sans-serif;
+
+    width: 16rem;
+    border: 0;
+
+    &::placeholder {
+        color: #d1d1d1;
+    }
+}
+
+h2 {
+    color: white;
+    margin: 0;
+    border-bottom: 0.125rem solid #bbb;
+
+    font: sans-serif;
+}
+
+.ep {
+    display: inline-block;
+
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+
+    > .name {
+        width: 2rem;
+        text-align: center;
+
+        color: #fff;
+    }
+
+    &_list {
+        column-count: 2;
+        column-rule: 0.125rem solid #bbb;
+        margin: 0.25rem 0;
+    }
+}
+
+input[type="checkbox"] {
+    &.vtt {
+        appearance: none;
+
+        color: gray;
+        text-align: center;
+
+        &:disabled {
+            color: crimson;
+        }
+
+        &:checked {
+            color: white;
+        }
+
+        &::after {
+            content: "𝐓";
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+        }
+    }
+}
+
+button {
+    background-color: #363636;
+    border: 0;
+    border-radius: 0.25rem;
+    padding: 0.25rem;
+    color: white;
+}
