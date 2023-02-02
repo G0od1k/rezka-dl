@@ -30,9 +30,11 @@ const rdl = {}
             }
         })
 
-        rdl.name = document.querySelector(
-            `#main div.b-post__origtitle`
-        )?.textContent
+        rdl.name = document
+            .querySelector(`#main div.b-post__origtitle`)
+            ?.textContent.replace(/[\/\\:*?"<>|]/g, (m) =>
+                String.fromCodePoint(m.codePointAt() + 0xfee0)
+            )
 
         performance.clearResourceTimings()
     }, 500)
