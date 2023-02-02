@@ -2,7 +2,7 @@ const rdl = {}
 
 ;(async () => {
     const vttRegExp = /vtt$/
-    const videoRegExp = /.+stream\.voidboost\.cc\/.*\.mp4.*/
+    const videoRegExp = /.+\.stream\.voidboost\.\w+\/.*\.mp4.*/
 
     interval = setInterval(() => {
         let network = performance
