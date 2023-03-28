@@ -5,6 +5,12 @@ const rdl = {}
     const videoRegExp = /.+\.stream\.voidboost\.\w+\/.*\.mp4.*/
 
     interval = setInterval(() => {
+        rdl.name = document
+            .querySelector(`#main div.b-post__origtitle`)
+            ?.textContent.replace(/[\/\\:*?"<>|]/g, (m) =>
+                String.fromCodePoint(m.codePointAt() + 0xfee0)
+            )
+
         let network = performance
             .getEntriesByType("resource")
             .map((x) => x.name)
@@ -29,12 +35,6 @@ const rdl = {}
                 rdl[id].url = url.replace(/(.+\.mp4).+/, "$1")
             }
         })
-
-        rdl.name = document
-            .querySelector(`#main div.b-post__origtitle`)
-            ?.textContent.replace(/[\/\\:*?"<>|]/g, (m) =>
-                String.fromCodePoint(m.codePointAt() + 0xfee0)
-            )
 
         performance.clearResourceTimings()
     }, 500)
