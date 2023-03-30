@@ -7,7 +7,9 @@ const rdl = {}
     interval = setInterval(() => {
         rdl.name = document
             .querySelector(`#main div.b-post__origtitle`)
-            ?.textContent.replace(/[\/\\:*?"<>|]/g, (m) =>
+            ?.textContent.split(` / `)
+            .slice(-1)[0]
+            .replace(/[\/\\:*?"<>|]/g, (m) =>
                 String.fromCodePoint(m.codePointAt() + 0xfee0)
             )
 
