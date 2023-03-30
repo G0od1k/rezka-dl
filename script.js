@@ -36,6 +36,10 @@ chrome.runtime.onMessage.addListener((message) => {
 
             episodeNode.querySelector(".name").textContent = x
 
+            if (!json[x].url) {
+                episodeNode.querySelector(".name").classList.add("noUrl")
+            }
+
             if (!json[x].vtt) {
                 episodeNode.querySelector(".vtt").disabled = true
                 episodeNode.querySelector(".vtt").checked = false
