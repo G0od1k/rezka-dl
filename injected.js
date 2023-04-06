@@ -20,12 +20,11 @@ const rdl = {}
 
         network.forEach((url) => {
             let id =
-                [".b-simple_seasons__list", ".b-simple_episodes__list"]
-                    .map(
-                        (x) =>
-                            document
-                                .querySelector(x + ">li.active")
-                                ?.textContent?.match(/\d+/)[0] ?? "0"
+                ["season", "episode"]
+                    .map((x) =>
+                        document
+                            .querySelector(".b-simple_episodes__list>li.active")
+                            .getAttribute(`data-${x}_id`)
                     )
                     .join("s") + "e"
 
