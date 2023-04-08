@@ -50,6 +50,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 episodeNode.id = `e` + x
 
                 episodeNode.querySelector(".name").textContent = x
+                episodeNode.querySelector(".name").href = json[x].url
 
                 if (!json[x].url) {
                     episodeNode.querySelector(".name").classList.add("noUrl")
