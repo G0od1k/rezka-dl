@@ -83,6 +83,12 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     })
 })
 
+document.querySelector("#selectAll").onclick = function () {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(tabs[0].id, "req-select")
+    })
+}
+
 function getSeasons(json) {
     return Object.keys(json)
         .filter((x) => x != "name")

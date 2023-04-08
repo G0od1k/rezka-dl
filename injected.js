@@ -49,5 +49,26 @@ const rdl = {}
 chrome.runtime.onMessage.addListener((req, from, res) => {
     if (req == "req-rdl") {
         res(rdl)
+    } else if (req == "req-select") {
+        selectList(document.querySelectorAll(".b-simple_episodes__list>li"))
     }
 })
+
+async function selectList(list) {
+    let i = 0
+    while (i < list.length) {
+        list[i++].click()
+        await new Promise((res) =>
+            (function test() {
+                if (
+                    document.querySelector("#cdnplayer-preloader").style
+                        .display == "none"
+                ) {
+                    res()
+                }
+                setTimeout(test, 100)
+            })()
+        )
+        await new Promise((res) => setTimeout(res, 1000))
+    }
+}
