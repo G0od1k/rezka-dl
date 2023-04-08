@@ -46,8 +46,8 @@ const rdl = {}
     }, 500)
 })()
 
-chrome.runtime.onMessage.addListener((message) => {
-    if (message == "req-rdl") {
-        chrome.runtime.sendMessage(JSON.stringify(rdl))
+chrome.runtime.onMessage.addListener((req, from, res) => {
+    if (req == "req-rdl") {
+        res(rdl)
     }
 })

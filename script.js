@@ -1,89 +1,86 @@
 const nameNode = document.querySelector(`#name`)
 
 chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-    chrome.tabs.sendMessage(tabs[0].id, "req-rdl")
-})
+    chrome.tabs.sendMessage(tabs[0].id, "req-rdl", (json) => {
+        nameNode.placeholder = json.name
 
-chrome.runtime.onMessage.addListener((message) => {
-    let json = JSON.parse(message)
+        let seasons = getSeasons(json).reverse()
 
-    nameNode.placeholder = json.name
+        seasons.forEach((x) => {
+            let h = document.createElement(`h2`),
+                epList = document.createElement(`div`),
+                seCheckbox = document.createElement(`input`),
+                seVttCheckbox = document.createElement(`input`)
 
-    let seasons = getSeasons(json).reverse()
+            seVttCheckbox.type = seCheckbox.type = `checkbox`
+            seVttCheckbox.checked = seCheckbox.checked = true
+            seVttCheckbox.className = `vtt`
+            h.id = `h${x}s`
+            epList.className = `ep_list`
+            epList.id = `ep_l${x}s`
 
-    seasons.forEach((x) => {
-        let h = document.createElement(`h2`),
-            epList = document.createElement(`div`),
-            seCheckbox = document.createElement(`input`),
-            seVttCheckbox = document.createElement(`input`)
+            seCheckbox.oninput = function () {
+                ;[...epList.querySelectorAll(`.epq`)].forEach(
+                    (x) => (x.checked = seCheckbox.checked)
+                )
+            }
 
-        seVttCheckbox.type = seCheckbox.type = `checkbox`
-        seVttCheckbox.checked = seCheckbox.checked = true
-        seVttCheckbox.className = `vtt`
-        h.id = `h${x}s`
-        epList.className = `ep_list`
-        epList.id = `ep_l${x}s`
+            seVttCheckbox.oninput = function () {
+                ;[...epList.querySelectorAll(`.vtt`)].forEach(
+                    (x) =>
+                        (x.checked = x.disabled ? false : seVttCheckbox.checked)
+                )
+            }
 
-        seCheckbox.oninput = function () {
-            ;[...epList.querySelectorAll(`.epq`)].forEach(
-                (x) => (x.checked = seCheckbox.checked)
-            )
+            nameNode.after(epList)
+            nameNode.after(h)
+            h.appendChild(seCheckbox)
+            h.append(x)
+            h.appendChild(seVttCheckbox)
+        })
+
+        Object.keys(json)
+            .filter((x) => x != "name")
+            .sort((a, b) => a.match(/\d+/g)[1] - b.match(/\d+/g)[1])
+            .forEach((x) => {
+                let episodeNode = document
+                    .querySelector("template#ep")
+                    .content.firstElementChild.cloneNode(true)
+
+                episodeNode.id = `e` + x
+
+                episodeNode.querySelector(".name").textContent = x
+
+                if (!json[x].url) {
+                    episodeNode.querySelector(".name").classList.add("noUrl")
+                }
+
+                if (!json[x].vtt) {
+                    episodeNode.querySelector(".vtt").disabled = true
+                    episodeNode.querySelector(".vtt").checked = false
+                }
+
+                document
+                    .querySelector(`#ep_l${x.match(/\d+/)[0]}s`)
+                    .appendChild(episodeNode)
+            })
+
+        document.querySelector(`#download`).onclick = function () {
+            let name = nameNode.value || nameNode.placeholder
+
+            if (isFilm(json)) {
+                download(json["0s0e"].url, name + ".mp4")
+                vttQ("0s0e") ? download(json["0s0e"].vtt, name + ".vtt") : false
+                return
+            }
+            getSortedEpisodes(json).forEach((x) => {
+                if (epQ(x)) {
+                    download(json[x].url, `${name}_${x}.mp4`)
+                    vttQ(x) ? download(json[x].vtt, `${name}_${x}.vtt`) : false
+                }
+            })
         }
-
-        seVttCheckbox.oninput = function () {
-            ;[...epList.querySelectorAll(`.vtt`)].forEach(
-                (x) => (x.checked = x.disabled ? false : seVttCheckbox.checked)
-            )
-        }
-
-        nameNode.after(epList)
-        nameNode.after(h)
-        h.appendChild(seCheckbox)
-        h.append(x)
-        h.appendChild(seVttCheckbox)
     })
-
-    Object.keys(json)
-        .filter((x) => x != "name")
-        .sort((a, b) => a.match(/\d+/g)[1] - b.match(/\d+/g)[1])
-        .forEach((x) => {
-            let episodeNode = document
-                .querySelector("template#ep")
-                .content.firstElementChild.cloneNode(true)
-
-            episodeNode.id = `e` + x
-
-            episodeNode.querySelector(".name").textContent = x
-
-            if (!json[x].url) {
-                episodeNode.querySelector(".name").classList.add("noUrl")
-            }
-
-            if (!json[x].vtt) {
-                episodeNode.querySelector(".vtt").disabled = true
-                episodeNode.querySelector(".vtt").checked = false
-            }
-
-            document
-                .querySelector(`#ep_l${x.match(/\d+/)[0]}s`)
-                .appendChild(episodeNode)
-        })
-
-    document.querySelector(`#download`).onclick = function () {
-        let name = nameNode.value || nameNode.placeholder
-
-        if (isFilm(json)) {
-            download(json["0s0e"].url, name + ".mp4")
-            vttQ("0s0e") ? download(json["0s0e"].vtt, name + ".vtt") : false
-            return
-        }
-        getSortedEpisodes(json).forEach((x) => {
-            if (epQ(x)) {
-                download(json[x].url, `${name}_${x}.mp4`)
-                vttQ(x) ? download(json[x].vtt, `${name}_${x}.vtt`) : false
-            }
-        })
-    }
 })
 
 function getSeasons(json) {
