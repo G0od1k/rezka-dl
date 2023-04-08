@@ -13,15 +13,34 @@ chrome.runtime.onMessage.addListener((message) => {
 
     seasons.forEach((x) => {
         let h = document.createElement(`h2`),
-            epList = document.createElement(`div`)
+            epList = document.createElement(`div`),
+            seCheckbox = document.createElement(`input`),
+            seVttCheckbox = document.createElement(`input`)
 
-        h.textContent = x
+        seVttCheckbox.type = seCheckbox.type = `checkbox`
+        seVttCheckbox.checked = seCheckbox.checked = true
+        seVttCheckbox.className = `vtt`
         h.id = `h${x}s`
         epList.className = `ep_list`
         epList.id = `ep_l${x}s`
 
+        seCheckbox.oninput = function () {
+            ;[...epList.querySelectorAll(`.epq`)].forEach(
+                (x) => (x.checked = seCheckbox.checked)
+            )
+        }
+
+        seVttCheckbox.oninput = function () {
+            ;[...epList.querySelectorAll(`.vtt`)].forEach(
+                (x) => (x.checked = x.disabled ? false : seVttCheckbox.checked)
+            )
+        }
+
         nameNode.after(epList)
         nameNode.after(h)
+        h.appendChild(seCheckbox)
+        h.append(x)
+        h.appendChild(seVttCheckbox)
     })
 
     Object.keys(json)
