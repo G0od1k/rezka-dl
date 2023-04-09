@@ -39,32 +39,29 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             h.appendChild(seVttCheckbox)
         })
 
-        Object.keys(json)
-            .filter((x) => x != "name")
-            .sort((a, b) => a.match(/\d+/g)[1] - b.match(/\d+/g)[1])
-            .forEach((x) => {
-                let episodeNode = document
-                    .querySelector("template#ep")
-                    .content.firstElementChild.cloneNode(true)
+        getSortedEpisodes(json).forEach((x) => {
+            let episodeNode = document
+                .querySelector("template#ep")
+                .content.firstElementChild.cloneNode(true)
 
-                episodeNode.id = `e` + x
+            episodeNode.id = `e` + x
 
-                episodeNode.querySelector(".name").textContent = x
-                episodeNode.querySelector(".name").href = json[x].url
+            episodeNode.querySelector(".name").textContent = x
+            episodeNode.querySelector(".name").href = json[x].url
 
-                if (!json[x].url) {
-                    episodeNode.querySelector(".name").classList.add("noUrl")
-                }
+            if (!json[x].url) {
+                episodeNode.querySelector(".name").classList.add("noUrl")
+            }
 
-                if (!json[x].vtt) {
-                    episodeNode.querySelector(".vtt").disabled = true
-                    episodeNode.querySelector(".vtt").checked = false
-                }
+            if (!json[x].vtt) {
+                episodeNode.querySelector(".vtt").disabled = true
+                episodeNode.querySelector(".vtt").checked = false
+            }
 
-                document
-                    .querySelector(`#ep_l${x.match(/\d+/)[0]}s`)
-                    .appendChild(episodeNode)
-            })
+            document
+                .querySelector(`#ep_l${x.match(/\d+/)[0]}s`)
+                .appendChild(episodeNode)
+        })
 
         document.querySelector(`#download`).onclick = function () {
             let name = nameNode.value || nameNode.placeholder
@@ -114,7 +111,7 @@ function getSortedEpisodes(json) {
     return Object.keys(json)
         .filter((x) => x != "name")
         .sort((a, b) => {
-            return getEp(a) - getEp(b) && getSe(a) - getSe(b)
+            return getEp(a) - getEp(b) || getSe(a) - getSe(b)
         })
 }
 
