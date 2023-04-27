@@ -21,17 +21,9 @@ const rdl = {}
             .filter((x) => vttRegExp.test(x) || videoRegExp.test(x))
 
         network.forEach((url) => {
-            let id =
-                ["season", "episode"]
-                    .map(
-                        (x) =>
-                            document
-                                .querySelector(
-                                    ".b-simple_episodes__list>li.active"
-                                )
-                                ?.getAttribute(`data-${x}_id`) ?? 0
-                    )
-                    .join("s") + "e"
+            let id = getEpisodeId(
+                document.querySelector(".b-simple_episodes__list>li.active")
+            )
 
             rdl[id] ??= {}
 
@@ -53,6 +45,14 @@ chrome.runtime.onMessage.addListener((req, from, res) => {
         selectList(document.querySelectorAll(".b-simple_episodes__list>li"))
     }
 })
+
+function getEpisodeId(el) {
+    return (
+        ["season", "episode"]
+            .map((x) => el?.getAttribute(`data-${x}_id`) ?? 0)
+            .join("s") + "e"
+    )
+}
 
 async function selectList(list) {
     let i = 0
