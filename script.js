@@ -13,8 +13,9 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 seVttCheckbox = document.createElement(`input`)
 
             seVttCheckbox.type = seCheckbox.type = `checkbox`
-            seVttCheckbox.checked = seCheckbox.checked = true
+            seCheckbox.checked = true
             seVttCheckbox.className = `vtt`
+            seVttCheckbox.disabled = true
             h.id = `h${x}s`
             epList.className = `ep_list`
             epList.id = `ep_l${x}s`
@@ -62,6 +63,13 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 .querySelector(`#ep_l${x.match(/\d+/)[0]}s`)
                 .appendChild(episodeNode)
         })
+
+        document
+            .querySelectorAll(`h2:has(+ .ep_list .vtt:not(:disabled)) > .vtt`)
+            .forEach((x) => {
+                x.disabled = false
+                x.checked = true
+            })
 
         document.querySelector(`#download`).onclick = function () {
             let name = nameNode.value || nameNode.placeholder
