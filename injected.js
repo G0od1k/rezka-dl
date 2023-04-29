@@ -55,20 +55,17 @@ function getEpisodeId(el) {
 }
 
 async function selectList(list) {
-    let i = 0
-    while (i < list.length) {
-        list[i++].click()
+    let i = -1
+    while (++i < list.length) {
+        list[i].click()
         await new Promise((res) =>
             (function test() {
-                if (
-                    document.querySelector("#cdnplayer-preloader").style
-                        .display == "none"
-                ) {
+                if (rdl[getEpisodeId(list[i])]?.url) {
                     res()
                 }
-                setTimeout(test, 100)
+                setTimeout(test, 500)
             })()
         )
-        await new Promise((res) => setTimeout(res, 1000))
+        await new Promise((res) => setTimeout(res, 750))
     }
 }
