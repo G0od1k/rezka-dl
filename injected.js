@@ -42,6 +42,10 @@ chrome.runtime.onMessage.addListener((req, from, res) => {
     if (req == "req-rdl") {
         res(rdl)
     } else if (req == "req-select") {
+        document
+            .querySelectorAll(".b-simple_episodes__list")
+            .forEach((x) => (x.style.display = null))
+
         selectList(document.querySelectorAll(".b-simple_episodes__list>li"))
     }
 })
