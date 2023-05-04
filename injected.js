@@ -1,4 +1,4 @@
-const rdl = {}
+const rdl = { eps: [] }
 
 ;(async () => {
     const vttRegExp = /vtt$/
@@ -15,22 +15,22 @@ const rdl = {}
                 String.fromCodePoint(m.codePointAt() + 0xfee0)
             )
 
+        rdl.isFilm = !document.querySelector("#simple-episodes-tabs")
+
         let network = performance
             .getEntriesByType("resource")
             .map((x) => x.name)
             .filter((x) => vttRegExp.test(x) || videoRegExp.test(x))
 
         network.forEach((url) => {
-            let id = getEpisodeId(
+            let episode = getEpisode(
                 document.querySelector(".b-simple_episodes__list>li.active")
             )
 
-            rdl[id] ??= {}
-
             if (vttRegExp.test(url)) {
-                rdl[id].vtt = url
+                episode.vtt = url
             } else {
-                rdl[id].url = url.replace(/(.+\.mp4).+/, "$1")
+                episode.url = url.replace(/(.+\.mp4).+/, "$1")
             }
         })
 
@@ -40,6 +40,9 @@ const rdl = {}
 
 chrome.runtime.onMessage.addListener((req, from, res) => {
     if (req == "req-rdl") {
+        rdl.eps = rdl.eps.sort((a, b) => {
+            return a.s - b.s || a.e - b.e
+        })
         res(rdl)
     } else if (req == "req-select") {
         document
@@ -50,12 +53,16 @@ chrome.runtime.onMessage.addListener((req, from, res) => {
     }
 })
 
-function getEpisodeId(el) {
-    return (
-        ["season", "episode"]
-            .map((x) => el?.getAttribute(`data-${x}_id`) ?? 0)
-            .join("s") + "e"
+function getEpisode(el) {
+    let [s, e] = ["season", "episode"].map((x) =>
+        parseInt(el?.getAttribute(`data-${x}_id`) ?? 0)
     )
+
+    let episode = rdl.eps.filter((x) => x.s == s && x.e == e)[0]
+
+    episode ??= rdl.eps.push({ s, e })
+
+    return episode
 }
 
 async function selectList(list) {
@@ -64,8 +71,9 @@ async function selectList(list) {
         list[i].click()
         await new Promise((res) =>
             (function test() {
-                if (rdl[getEpisodeId(list[i])]?.url) {
+                if (getEpisode(list[i]).url) {
                     res()
+                    return
                 }
                 setTimeout(test, 500)
             })()

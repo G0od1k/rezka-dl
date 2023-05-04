@@ -4,64 +4,61 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, "req-rdl", (json) => {
         nameNode.placeholder = json.name
 
-        let seasons = getSeasons(json).reverse()
+        getSeasons(json)
+            .reverse()
+            .forEach((x) => {
+                let seasonNode = document
+                        .querySelector("template#se")
+                        .content.cloneNode(true),
+                    seCheckbox = seasonNode.querySelector(`h2 > input`),
+                    seVttCheckbox = seasonNode.querySelector(`h2 > .vtt`)
 
-        seasons.forEach((x) => {
-            let h = document.createElement(`h2`),
-                epList = document.createElement(`div`),
-                seCheckbox = document.createElement(`input`),
-                seVttCheckbox = document.createElement(`input`)
+                seasonNode.querySelector(`h2`).id = `h${x}s`
+                seasonNode.querySelector(`.ep_list`).id = `ep_l${x}s`
 
-            seVttCheckbox.type = seCheckbox.type = `checkbox`
-            seCheckbox.checked = true
-            seVttCheckbox.className = `vtt`
-            seVttCheckbox.disabled = true
-            h.id = `h${x}s`
-            epList.className = `ep_list`
-            epList.id = `ep_l${x}s`
+                seCheckbox.after(x)
 
-            seCheckbox.oninput = function () {
-                ;[...epList.querySelectorAll(`.epq`)].forEach(
-                    (x) => (x.checked = seCheckbox.checked)
-                )
-            }
+                seCheckbox.oninput = function () {
+                    document
+                        .querySelectorAll(`#ep_l${x}s .epq`)
+                        .forEach((x) => (x.checked = seCheckbox.checked))
+                }
 
-            seVttCheckbox.oninput = function () {
-                ;[...epList.querySelectorAll(`.vtt`)].forEach(
-                    (x) =>
-                        (x.checked = x.disabled ? false : seVttCheckbox.checked)
-                )
-            }
+                seVttCheckbox.oninput = function () {
+                    document
+                        .querySelectorAll(`#ep_l${x}s .vtt`)
+                        .forEach(
+                            (x) =>
+                                (x.checked = x.disabled
+                                    ? false
+                                    : seVttCheckbox.checked)
+                        )
+                }
 
-            nameNode.after(epList)
-            nameNode.after(h)
-            h.appendChild(seCheckbox)
-            h.append(x)
-            h.appendChild(seVttCheckbox)
-        })
+                nameNode.after(seasonNode)
+            })
 
-        getSortedEpisodes(json).forEach((x) => {
+        json.eps.forEach((x) => {
             let episodeNode = document
-                .querySelector("template#ep")
-                .content.firstElementChild.cloneNode(true)
+                    .querySelector("template#ep")
+                    .content.firstElementChild.cloneNode(true),
+                nameNode = episodeNode.querySelector(".name")
 
-            episodeNode.id = `e` + x
+            episodeNode.id = `e${x.s}s${x.e}e`
 
-            episodeNode.querySelector(".name").textContent = x
-            episodeNode.querySelector(".name").href = json[x].url
+            nameNode.textContent = x.e
+            nameNode.href = x.url
 
-            if (!json[x].url) {
-                episodeNode.querySelector(".name").classList.add("noUrl")
+            if (!x.url) {
+                nameNode.classList.add("noUrl")
             }
 
-            if (!json[x].vtt) {
+            if (!x.vtt) {
                 episodeNode.querySelector(".vtt").disabled = true
                 episodeNode.querySelector(".vtt").checked = false
             }
 
-            document
-                .querySelector(`#ep_l${x.match(/\d+/)[0]}s`)
-                .appendChild(episodeNode)
+            document.querySelector(`#ep_l${x.s}s`).appendChild(episodeNode)
         })
 
         document
@@ -74,15 +71,20 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         document.querySelector(`#download`).onclick = function () {
             let name = nameNode.value || nameNode.placeholder
 
-            if (isFilm(json)) {
-                download(json["0s0e"].url, name + ".mp4")
-                vttQ("0s0e") ? download(json["0s0e"].vtt, name + ".vtt") : false
+            if (json.info.isFilm) {
+                download(json.eps[0].url, name + ".mp4")
+                vttQ(json.eps[0])
+                    ? download(json.eps[0].vtt, name + ".vtt")
+                    : false
                 return
             }
-            getSortedEpisodes(json).forEach((x) => {
+
+            json.eps.forEach((x) => {
                 if (epQ(x)) {
-                    download(json[x].url, `${name}_${x}.mp4`)
-                    vttQ(x) ? download(json[x].vtt, `${name}_${x}.vtt`) : false
+                    download(x.url, `${name}_${x.s}s${x.e}e.mp4`)
+                    vttQ(x)
+                        ? download(x.vtt, `${name}_${x.s}s${x.e}e.vtt`)
+                        : false
                 }
             })
         }
@@ -96,39 +98,18 @@ document.querySelector("#selectAll").onclick = function () {
 }
 
 function getSeasons(json) {
-    return Object.keys(json)
-        .filter((x) => x != "name")
-        .map((x) => getSe(x))
+    return json.eps
+        .map((x) => x.s)
         .filter((v, i, a) => a.indexOf(v) === i)
         .sort((a, b) => a - b)
 }
 
-function isFilm(json) {
-    return Object.keys(json).join("") == "name0s0e"
-}
-
 function vttQ(ep) {
-    return document.querySelector(`#e${ep}>.vtt`).checked
+    return document.querySelector(`#e${ep.s}s${ep.e}e>.vtt`).checked
 }
 
 function epQ(ep) {
-    return document.querySelector(`#e${ep}>.epq`).checked
-}
-
-function getSortedEpisodes(json) {
-    return Object.keys(json)
-        .filter((x) => x != "name")
-        .sort((a, b) => {
-            return getEp(a) - getEp(b) || getSe(a) - getSe(b)
-        })
-}
-
-function getSe(string) {
-    return string.match(/\d+/g)[0]
-}
-
-function getEp(string) {
-    return string.match(/\d+/g)[1]
+    return document.querySelector(`#e${ep.s}s${ep.e}e>.epq`).checked
 }
 
 function download(url, name) {
