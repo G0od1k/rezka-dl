@@ -68,6 +68,13 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 x.checked = true
             })
 
+        if (json.isFilm) {
+            document
+                .querySelectorAll(`h2`)
+                .forEach((x) => x.parentNode.removeChild(x))
+            document.querySelector("#e0s0e > a").textContent = `Фільм`
+        }
+
         document.querySelector(`#download`).onclick = function () {
             let name = nameNode.value || nameNode.placeholder
 
