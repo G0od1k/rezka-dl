@@ -1,27 +1,50 @@
+@columnCount: 4;
+
+:root {
+    --color-bg: #09161c;
+    --color-border: #222e33;
+    --color-placeholder: #848b8e;
+
+    --color-checkbox: #0c465a;
+    --color-checkbox-active: #00adef;
+
+    --color-button: #2d2d2d;
+    --color-button-active: #5d5d5d;
+    --color-button-hover: #4d4d4d;
+
+    --color-red: #cd3240;
+}
+
 body {
-    background-color: #121212;
+    background-color: var(--color-bg);
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 #name {
     background-color: #0000;
     color: white;
 
-    font: 1.5rem sans-serif;
+    font-size: 1.5rem;
 
-    width: 16rem;
+    width: (6 * @columnCount + (@columnCount - 1) * 0.125) * 1rem;
     border: 0;
+    padding: 0;
 
     &::placeholder {
-        color: #d1d1d1;
+        color: var(--color-placeholder);
     }
 }
 
 h2 {
     color: white;
     margin: 0;
-    border-bottom: 0.125rem solid #bbb;
+    border-bottom: 0.125rem solid var(--color-border);
 
-    font: sans-serif;
+    cursor: default;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .ep {
@@ -40,45 +63,71 @@ h2 {
         color: #fff;
 
         &.noUrl {
-            color: crimson;
+            color: var(--color-red);
         }
     }
 
     &_list {
-        column-count: 2;
-        column-rule: 0.125rem solid #bbb;
         margin: 0.25rem 0;
+
+        display: grid;
+        grid-template-columns: repeat(@columnCount, 1fr);
+    }
+
+    width: 6rem;
+
+    & + &:not(:nth-child(@{columnCount}n + 1)) {
+        border-left: 0.125rem solid var(--color-border);
     }
 }
 
 input[type="checkbox"] {
-    &.vtt {
-        appearance: none;
+    cursor: pointer;
 
-        color: gray;
+    appearance: none;
+    margin: 0.25rem;
+
+    color: var(--color-checkbox);
+
+    &:disabled {
+        color: var(--color-red);
+    }
+
+    &:checked {
+        color: var(--color-checkbox-active);
+    }
+
+    &::after {
+        content: "✔";
+
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+
+        line-height: 1rem;
         text-align: center;
+        font-weight: bold;
+    }
 
-        &:disabled {
-            color: crimson;
-        }
-
-        &:checked {
-            color: white;
-        }
-
-        &::after {
-            content: "𝐓";
-            display: inline-block;
-            width: 1rem;
-            height: 1rem;
-        }
+    &.vtt::after {
+        content: "㏄";
     }
 }
 
 button {
-    background-color: #363636;
+    background-color: var(--color-button);
     border: 0;
-    border-radius: 0.25rem;
-    padding: 0.25rem;
+    padding: 0.3125rem 0.625rem;
     color: white;
+    font-size: 0.875rem;
+
+    cursor: pointer;
+
+    &:hover {
+        background-color: var(--color-button-hover);
+    }
+
+    &:active {
+        background-color: var(--color-button-active);
+    }
 }
