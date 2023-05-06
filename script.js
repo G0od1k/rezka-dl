@@ -78,7 +78,7 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         document.querySelector(`#download`).onclick = function () {
             let name = nameNode.value || nameNode.placeholder
 
-            if (json.info.isFilm) {
+            if (json.isFilm) {
                 download(json.eps[0].url, name + ".mp4")
                 vttQ(json.eps[0])
                     ? download(json.eps[0].vtt, name + ".vtt")
