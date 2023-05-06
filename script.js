@@ -61,12 +61,21 @@ chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
             document.querySelector(`#ep_l${x.s}s`).appendChild(episodeNode)
         })
 
-        document
-            .querySelectorAll(`h2:has(+ .ep_list .vtt:not(:disabled)) > .vtt`)
-            .forEach((x) => {
+        try {
+            document
+                .querySelectorAll(
+                    `h2:has(+ .ep_list .vtt:not(:disabled)) > .vtt`
+                )
+                .forEach((x) => {
+                    x.disabled = false
+                    x.checked = true
+                })
+        } catch {
+            document.querySelectorAll(`h2 > .vtt`).forEach((x) => {
                 x.disabled = false
                 x.checked = true
             })
+        }
 
         if (json.isFilm) {
             document
