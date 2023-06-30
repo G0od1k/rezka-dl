@@ -60,7 +60,10 @@ function getEpisode(el) {
 
     let episode = rdl.eps.filter((x) => x.s == s && x.e == e)[0]
 
-    episode ??= rdl.eps.push({ s, e })
+    if (!episode) {
+        episode = { s, e }
+        rdl.eps.push(episode)
+    }
 
     return episode
 }
